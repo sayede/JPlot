@@ -1,0 +1,64 @@
+#!/bin/bash
+# JPlot : Perl/JavaScript programm to plot WIEN2K's Density of States and Bandstructure. 
+#
+# Revision: 1.0 
+# Author: A. SAYEDE (adlane.sayede@univ-artois.fr)  
+
+
+liendos="'JPlot/plotdos.pl?SID=\$SID'";
+lienband="'JPlot/plotband.pl?SID=\$SID'";
+
+if [ -z ${WIENROOT+x} ]; then 
+    echo "WIENROOT is unset ! Please give the WIEN2K root ?"; 
+    read ROOT;
+else 
+    ROOT=$WIENROOT; 
+fi
+
+ROOTJP=$ROOT/SRC_w2web/htdocs/exec/JPlot;
+
+read -r -p "This will install JPlot in $ROOTJP directory, do you agree ? [Y/n] " resp1
+if [[ $resp1 =~ ^([yY][eE][sS]|[yY])$ ]]; then
+
+	if [ -d "$ROOTJP" ]; then
+
+            read -r -p "JPlot directory already exist, Its contents will be affected, continue ? [Y/n]" resp2
+	    if [[ $resp2 =~ ^([nN][oO])$ ]]; then 
+		echo "Bye";
+		exit;
+	    fi
+
+	else 
+		mkdir $ROOTJP;
+    	fi
+
+	cp -a * $ROOTJP/.;
+	rm $ROOTJP/INSTALL;
+
+	if [ ! -f $ROOTJP/../dos.pl_save ]; then
+	    cp $ROOTJP/../dos.pl $ROOTJP/../dos.pl_save
+	else
+	    cp $ROOTJP/../dos.pl_save $ROOTJP/../dos.pl
+	fi
+
+	if [ ! -f $ROOTJP/../band.pl_save ]; then
+	    cp $ROOTJP/../band.pl $ROOTJP/../band.pl_save
+	else
+	    cp $ROOTJP/../band.pl_save $ROOTJP/../band.pl
+	fi
+
+	sed '/<INPUT TYPE=SUBMIT VALUE="dosplot">/a or <button type="button" onclick=\"window.open\('$liendos'\)\">JPlot<\/button>' $ROOTJP/../dos.pl > $ROOTJP/../tmp;
+	mv $ROOTJP/../tmp $ROOTJP/../dos.pl; 
+	chmod +x $ROOTJP/../dos.pl;
+
+	sed '/<INPUT TYPE=SUBMIT VALUE="plot bandstructure">/a or <button type="button" onclick=\"window.open\('$lienband'\)\">JPlot<\/button>' $ROOTJP/../band.pl > $ROOTJP/../tmp;
+	mv $ROOTJP/../tmp $ROOTJP/../band.pl; 
+	chmod +x $ROOTJP/../band.pl;
+
+
+	echo "Done";
+
+else
+        echo "Bye";
+fi
+
