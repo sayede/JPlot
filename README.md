@@ -2,7 +2,7 @@
 
 JPlot is a Perl/JavaScript library that produce interactive charts for WIEN2K code. It produces the same kind of plots (Density of States and Bandstructure) as the native WIEN2K interface but with no 3th program (i.e. gnuplot).
 
-1- Installation :
+### Installation 
  
  -Download the latest release (see above, zip or tar.gz)
  -Extract JPlot out the compressed files( zip or tar.gz) : unzip master.zip or tar -xzvf master.tar.gz
