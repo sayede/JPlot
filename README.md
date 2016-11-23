@@ -17,7 +17,7 @@ The [wiki](https://github.com/sayede/JPlot/wiki) has a set of example plots made
 
 ### Contributing 
 
-Bug reports and fixes, suggestions, and so on should be submitted via GitHub as [Issues](https://github.com/sayede/JPlo/issues) or [Pull Requests](https://github.com/sayede/JPlo/pulls).
+Bug reports and fixes, suggestions, and so on should be submitted via GitHub as [Issues](https://github.com/sayede/JPlot/issues) or [Pull Requests](https://github.com/sayede/JPlot/pulls).
 
 ### Dependence
 	
