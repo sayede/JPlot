@@ -19,10 +19,13 @@ The [wiki](https://github.com/sayede/JPlot/wiki) has a set of example plots made
 
 Bug reports and fixes, suggestions, and so on should be submitted via GitHub as [Issues](https://github.com/sayede/JPlo/issues) or [Pull Requests](https://github.com/sayede/JPlo/pulls).
 
+### Dependence
+	
+JPlot use : 
+* JQuery
+* Bootstrap
+* Bootbox 
+* jQuery UI
+* Highcharts
 
-ACKNOWLEDGEMENTS
-----------------
-
-JPlot use `highcharts`(https://github.com/sayede/JPlot/wiki)
-
-
+Those libraries are already contained in the zip or tar.gz archive. It is not necessary to install them.
