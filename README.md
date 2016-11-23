@@ -15,21 +15,14 @@ This will add two buttons to the w2web interface, one in the bandstructure task 
 
 The [wiki](https://github.com/sayede/JPlot/wiki) has a set of example plots made with JSplot.
 
+### Contributing 
 
-CONTRIBUTING
-------------
-
-Bug reports and fixes, suggestions, and so on should be submitted via
-GitHub as [Issues](https://github.com/eassmann/prima.py/issues) or
-[Pull Requests](https://github.com/eassmann/prima.py/pulls).
+Bug reports and fixes, suggestions, and so on should be submitted via GitHub as [Issues](https://github.com/sayede/JPlo/issues) or [Pull Requests](https://github.com/sayede/JPlo/pulls).
 
 
 ACKNOWLEDGEMENTS
 ----------------
 
-Thanks to [Maurits](http://www.cpfs.mpg.de/haverkort/) for letting me build
-upon his code.
+JPlot use `highcharts`(https://github.com/sayede/JPlot/wiki)
 
-Hex colors and color names are handled by the `webcolors` module,
-written by James Bennett.
 
