@@ -986,13 +986,13 @@ function() {
 \$(".sba").click(
 function() {
 bootbox.dialog({
-title: 'About JSplot',
+title: 'About JPlot',
 size: 'medium',
 message: '<div class="row"> ' +
 '<div class="col-md-12">'+
-'<p>For more informations visit JSplot <a target="_blank" href="https://sayede.github.io/JPlot/">Webpage</a>.</p>'+
+'<p>For more informations visit JPlot <a target="_blank" href="https://sayede.github.io/JPlot/">Webpage</a>.</p>'+
 '<p>Bug reports and fixes, suggestions, and so on should be submitted via GitHub as <a target="_blank" href="https://github.com/sayede/JPlot/issues" aria-hidden="true">Issues</a> or <a target="_blank" href="https://github.com/sayede/JPlot/pulls" aria-hidden="true">Pull Requests</a>.</p>'+
-'<p>A set of example can be found in the JSplot <a target="_blank" href="https://github.com/sayede/JPlot/wiki" aria-hidden="true">wiki</a>.</p>'+
+'<p>A set of example can be found in the JPlot <a target="_blank" href="https://github.com/sayede/JPlot/wiki" aria-hidden="true">wiki</a>.</p>'+
 '</div></div>'+
 '</div>',
 buttons: {
