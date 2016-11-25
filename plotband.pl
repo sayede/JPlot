@@ -8,7 +8,7 @@ require "../../../libs/w2web.pl";
 require "../../../libs/struct.pl";
 &GetInput;
 &GetSession;
-
+$error=0;
 print "Content-type: text/html\n\n";
 print <<EOF;
 <html><head>
@@ -30,6 +30,13 @@ print <<EOF;
 <link rel="stylesheet" href="/exec/JPlot/jquery-ui.css">
 <script src="/exec/JPlot/jquery-ui.js"></script>
   <style>
+
+
+ .bootbox-alert div div div button.btn-primary{
+    color: #fff;
+    background-color: #d9534f;
+    border-color: #d9534f;     
+    }
 
 .ui-resizable-helper { border: 2px dotted #4cae4c; }
 #fountainG{
@@ -245,7 +252,7 @@ print <<EOF;
                                              className: "btn-success",
 					      callback: function () {
 							spin=\$('#spintype').val();
-							window.location.href = '/exec/JPlot/plotband.pl?SID=683694&spin='+spin+'';
+							window.location.href = '/exec/JPlot/plotband.pl?SID=$SID&spin='+spin+'';
 							}	
                                               }
                                          }
@@ -253,7 +260,9 @@ print <<EOF;
                                  })
 
 </script>
+</body></html>
 EOF
+exit
 }
     if($spin eq "updn"){
 	&spinupdn;
@@ -273,8 +282,7 @@ sub spin{
 $spin=shift;
 print "<script> \n";
 unless(open(FILE,"$DIR/$CASE.bands$spin.agr")) {
-        &system_error("Can't read file $DIR/$CASE.bands$spin.agr.\n");
-        exit;
+	$error=1;
 }
     @lines = <FILE>;
     close(FILE);
@@ -367,13 +375,11 @@ sub spinupdn{
 $spin="updn";
 print "<script> \n";
 unless(open(FILEUP,"$DIR/$CASE.bandsup.agr")) {
-        &system_error("Can't read file $DIR/$CASE.bandsup.agr.\n");
-        exit;
+	$error=1;
 }
 
 unless(open(FILEDN,"$DIR/$CASE.bandsdn.agr")) {
-        &system_error("Can't read file $DIR/$CASE.bandsdn.agr.\n");
-        exit;
+	$error=1;
 }
 
     @linesup = <FILEUP>;
@@ -843,7 +849,17 @@ saveAs(new Blob([svg], {type:"application/svg+xml"}), "band.svg")
 
 
 \$(document).ready(function () {
+EOF
+if ($error==1){
+print <<EOF;
 
+    bootbox.alert({
+        message: "Can't read file $CASE.bands(up/dn).agr, please check your calculations !",
+        size: 'small',
+		});
+EOF
+}
+print <<EOF;
 \$(".sba").hover(
 function() {
 \$(this).fadeTo("fast",0.6);
@@ -855,13 +871,13 @@ function() {
 \$(".sba").click(
 function() {
 bootbox.dialog({
-title: 'About JSplot',
+title: 'About JPlot',
 size: 'medium',
 message: '<div class="row"> ' +
 '<div class="col-md-12">'+
-'<p>For more informations visit JSplot <a target="_blank" href="https://sayede.github.io/JPlot/">Webpage</a>.</p>'+
+'<p>For more informations visit JPlot <a target="_blank" href="https://sayede.github.io/JPlot/">Webpage</a>.</p>'+
 '<p>Bug reports and fixes, suggestions, and so on should be submitted via GitHub as <a target="_blank" href="https://github.com/sayede/JPlot/issues" aria-hidden="true">Issues</a> or <a target="_blank" href="https://github.com/sayede/JPlot/pulls" aria-hidden="true">Pull Requests</a>.</p>'+
-'<p>A set of example can be found in the JSplot <a target="_blank" href="https://github.com/sayede/JPlot/wiki" aria-hidden="true">wiki</a>.</p>'+
+'<p>A set of example can be found in the JPlot <a target="_blank" href="https://github.com/sayede/JPlot/wiki" aria-hidden="true">wiki</a>.</p>'+
 '</div></div>'+
 '</div>',
 buttons: {

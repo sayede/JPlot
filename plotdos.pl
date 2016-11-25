@@ -8,17 +8,22 @@ require "../../../libs/w2web.pl";
 require "../../../libs/struct.pl";
 &GetInput;
 &GetSession;
+
+$error1=0;
+$error2=0;
+$error3=0;
+$numdos=0;
+
 print "Content-type: text/html\n\n";
 
-$numdos=0;
-open(FILE, "$DIR/$CASE.int") or die "Can't open `$CASE.int': $!";
+open(FILE, "$DIR/$CASE.int") or $error1=1; #die "Can't open `$CASE.int': $!";
 while (my $ligne = <FILE>) {
 $numdos ++;
 }
 $numdos=$numdos-3;
 close(FILE);
 
-open(FILE, "$DIR/$CASE.struct") or die "Can't open `$CASE.struct': $!";
+open(FILE, "$DIR/$CASE.struct") or $error2=1; #die "Can't open `$CASE.struct': $!";
 @line = <FILE>;
 foreach $line (@line){ 
 	if ($line =~ /Z:/){
@@ -31,7 +36,7 @@ close(FILE);
 
 $nat=@col3;
 
-opendir( $dir, $DIR) || die "can't opendir $DIR: $!";
+opendir( $dir, $DIR) or die "can't opendir $DIR: $!";
 foreach ( grep { !/^\.\.?$/ } (sort readdir $dir) )  {
     if ($_ =~ /dos/ and $_ =~ /ev/ and $_ =~ /up/){
     push (@fileup, "$_");
@@ -54,7 +59,7 @@ $selspin='<select style="width:auto" class="form-control" id="selspin"><option a
 $filene="$DIR/@fileup[0]";
 
 foreach (@fileup){
-open(FILE, "$DIR/$_") or die "Can't open `$_': $!";
+open(FILE, "$DIR/$_") or $error3=1; #die "Can't open `$_': $!";
 @line = <FILE>;
 shift @line; shift @line;
 @line[0] =~ s/^\s+//;
@@ -93,7 +98,7 @@ shift @line; shift @line; shift @line;
 
 $k=0;
 foreach (@filedn){
-open(FILE, "$DIR/$_") or die "Can't open `$_': $!";
+open(FILE, "$DIR/$_") or $error3=1; #die "Can't open `$_': $!";
 @line = <FILE>;
 shift @line; shift @line; shift @line;
 
@@ -115,7 +120,7 @@ shift @line; shift @line; shift @line;
 $filene="$DIR/@file[0]"; 
 
 foreach (@file){
-open(FILE, "$DIR/$_") or die "Can't open `$_': $!";
+open(FILE, "$DIR/$_") or $error3=1; #die "Can't open `$_': $!";
 @line = <FILE>;
 shift @line; shift @line;
 @line[0] =~ s/^\s+//;
@@ -135,7 +140,7 @@ close(FILE);
 
 $k=0;
 foreach (@file){
-open(FILE, "$DIR/$_") or die "Can't open `$_': $!";
+open(FILE, "$DIR/$_") or $error3=1; #die "Can't open `$_': $!";
 @line = <FILE>;
 shift @line; shift @line; shift @line;
 
@@ -154,7 +159,7 @@ shift @line; shift @line; shift @line;
 
 }
 
-open(FILE, $filene) or die "Can't open `$_': $!";
+open(FILE, $filene) or $error3=1; #die "Can't open `$_': $!";
 @line = <FILE>;
 shift @line;shift @line;shift @line;
     foreach (@line){
@@ -974,7 +979,38 @@ x.remove(x.selectedIndex);
 
 
 \$(document).ready(function () {
+EOF
 
+if ($error1==1){
+print <<EOF;
+
+    bootbox.alert({
+        message: "Can't read file $CASE.int, please check your files !",
+        size: 'small',
+                });
+EOF
+}
+
+if ($error2==1){
+print <<EOF;
+
+    bootbox.alert({
+        message: "Can't read file $CASE.struct, please check your files !",
+        size: 'small',
+                });
+EOF
+}
+
+if ($error3==1){
+print <<EOF;
+
+    bootbox.alert({
+        message: "Can't read file $CASE.dos(1/2/3)ev(up/dn), please check your calculations !",
+        size: 'small',
+                });
+EOF
+}
+print <<EOF;
 \$(".sba").hover(
 function() {
 \$(this).fadeTo("fast",0.6);
@@ -986,13 +1022,13 @@ function() {
 \$(".sba").click(
 function() {
 bootbox.dialog({
-title: 'About JSplot',
+title: 'About JPlot',
 size: 'medium',
 message: '<div class="row"> ' +
 '<div class="col-md-12">'+
-'<p>For more informations visit JSplot <a target="_blank" href="https://sayede.github.io/JPlot/">Webpage</a>.</p>'+
+'<p>For more informations visit JPlot <a target="_blank" href="https://sayede.github.io/JPlot/">Webpage</a>.</p>'+
 '<p>Bug reports and fixes, suggestions, and so on should be submitted via GitHub as <a target="_blank" href="https://github.com/sayede/JPlot/issues" aria-hidden="true">Issues</a> or <a target="_blank" href="https://github.com/sayede/JPlot/pulls" aria-hidden="true">Pull Requests</a>.</p>'+
-'<p>A set of example can be found in the JSplot <a target="_blank" href="https://github.com/sayede/JPlot/wiki" aria-hidden="true">wiki</a>.</p>'+
+'<p>A set of example can be found in the JPlot <a target="_blank" href="https://github.com/sayede/JPlot/wiki" aria-hidden="true">wiki</a>.</p>'+
 '</div></div>'+
 '</div>',
 buttons: {
