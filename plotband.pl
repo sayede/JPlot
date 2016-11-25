@@ -245,7 +245,7 @@ print <<EOF;
                                              className: "btn-success",
 					      callback: function () {
 							spin=\$('#spintype').val();
-							window.location.href = '/exec/JPlot/plotband.pl?SID=683694&spin='+spin+'';
+							window.location.href = '/exec/JPlot/plotband.pl?SID=$SID&spin='+spin+'';
 							}	
                                               }
                                          }
