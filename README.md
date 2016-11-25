@@ -6,8 +6,8 @@ JPlot is a Perl/JavaScript library that produce interactive charts for WIEN2K co
  
  * Download the latest release (see above, zip or tar.gz)
  * Extract JPlot out the compressed files( zip or tar.gz) : `unzip master.zip` or`tar -xzvf master.tar.gz`
- * Enter in JPlot directory : `cd JPlot/`
- * Execute the bash script `./INSTALL` in the JPlot folder following all prompts until completion
+ * Enter in JPlot directory : `cd JPlot-master/`
+ * Execute the bash script `chmod +x ./INSTALL; ./INSTALL` in the JPlot folder following all prompts until completion
 
 This will add two buttons to the w2web interface, one in the bandstructure task add1 and an other in the DOS task.
 
