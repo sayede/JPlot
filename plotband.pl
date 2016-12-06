@@ -8,7 +8,7 @@ require "../../../libs/w2web.pl";
 require "../../../libs/struct.pl";
 &GetInput;
 &GetSession;
-$error=0;
+$error = 0;
 print "Content-type: text/html\n\n";
 print <<EOF;
 <html><head>
@@ -221,13 +221,13 @@ print <<EOF;
 </head><body bgcolor="#F0F0F0">
 EOF
 
-if($spinpol=~ /CHECKED/){
+if ( $spinpol =~ /CHECKED/ ) {
 
-use CGI;
-$obj = new CGI;
-$spin= $obj->param ( 'spin' );
-if(!$spin){
-print <<EOF;
+    use CGI;
+    $obj  = new CGI;
+    $spin = $obj->param('spin');
+    if ( !$spin ) {
+        print <<EOF;
 <script>
                                  bootbox.dialog({
                                      title: 'Plot type',
@@ -262,125 +262,138 @@ print <<EOF;
 </script>
 </body></html>
 EOF
-exit
-}
-    if($spin eq "updn"){
-	&spinupdn;
-    }else{
-	&spin("$spin");
+        exit;
     }
-}else{
-    $spin="";
+    if ( $spin eq "updn" ) {
+        &spinupdn;
+    }
+    else {
+        &spin("$spin");
+    }
+}
+else {
+    $spin = "";
     &spin("$spin");
 }
 &spijplot($spin);
 &rest;
 
-
-
-sub spin{
-$spin=shift;
-print "<script> \n";
-unless(open(FILE,"$DIR/$CASE.bands$spin.agr")) {
-	$error=1;
-}
+sub spin {
+    $spin = shift;
+    print "<script> \n";
+    unless ( open( FILE, "$DIR/$CASE.bands$spin.agr" ) ) {
+        $error = 1;
+    }
     @lines = <FILE>;
     close(FILE);
     chomp(@lines);
-print <<EOF;
+    print <<EOF;
 function dodata_$spin() { 
 lntpp="solid";
 lw = parseFloat(document.getElementById("lw").value);
 lclr= document.getElementById("lclr").value;
 efc= document.getElementById("efcc").value;
 EOF
-    $i=0;
+    $i = 0;
     for $line (@lines) {
-	$line =~ s/^\s+//;
-	@lin = split( /\s+/, $line );    
-	if (@lin[0] eq "@" and @lin[1] eq "xaxis" and @lin[2] eq "ticklabel" and @lin[3] ne "char"){
-	@lin[4] =~ s/^.{1,2}//s;
-	    if(@lin[4] eq "G" or @lin[4] eq "\\xG\""){
-	    push (@label,"\\u0393");
-	    }else{
-	    push (@label, @lin[4]);
-	    }
-	}
+        $line =~ s/^\s+//;
+        @lin = split( /\s+/, $line );
+        if (    @lin[0] eq "@"
+            and @lin[1] eq "xaxis"
+            and @lin[2] eq "ticklabel"
+            and @lin[3] ne "char" )
+        {
+            @lin[4] =~ s/^.{1,2}//s;
+            if ( @lin[4] eq "G" or @lin[4] eq "\\xG\"" ) {
+                push( @label, "\\u0393" );
+            }
+            else {
+                push( @label, @lin[4] );
+            }
+        }
 
-	if (@lin[0] eq "@" and @lin[1] eq "xaxis" and @lin[2] eq "tick" and @lin[3] eq "major" and @lin[4] ne "grid"){
-	push (@posi, @lin[5]);
-	}
+        if (    @lin[0] eq "@"
+            and @lin[1] eq "xaxis"
+            and @lin[2] eq "tick"
+            and @lin[3] eq "major"
+            and @lin[4] ne "grid" )
+        {
+            push( @posi, @lin[5] );
+        }
 
-	if (@lin[0] eq "@" and @lin[1] eq "world"){
-	chop(@lin[4]);
-	$longeur=@lin[4];
-	}
-        
-        if (@lin[1] eq "bandindex:" and @lin[2] eq "1"){
-        $index1=$i;
-        }	
+        if ( @lin[0] eq "@" and @lin[1] eq "world" ) {
+            chop( @lin[4] );
+            $longeur = @lin[4];
+        }
 
-        if (@lin[1] eq "bandindex:" and @lin[2] eq "2"){
-        $index2=$i;
-        }	  
+        if ( @lin[1] eq "bandindex:" and @lin[2] eq "1" ) {
+            $index1 = $i;
+        }
 
-    $i++
+        if ( @lin[1] eq "bandindex:" and @lin[2] eq "2" ) {
+            $index2 = $i;
+        }
+
+        $i++;
     }
-    $index=$index2-$index1-5;
-    
+    $index = $index2 - $index1 - 5;
+
     print "tkP=[";
-    foreach (@posi){
-    print " $_,";
+    foreach (@posi) {
+        print " $_,";
     }
     print "]\n";
 
     print "KL=[";
-    foreach (@label){
-    print " \"$_\",";
+    foreach (@label) {
+        print " \"$_\",";
     }
     print "]\n";
 
-    $ii=0; 
-    $t=0;
+    $ii = 0;
+    $t  = 0;
     for $line (@lines) {
-	$line =~ s/^\s+//;
-	@lin = split( /\s+/, $line );    
+        $line =~ s/^\s+//;
+        @lin = split( /\s+/, $line );
 
-	if (@lin[1] eq "bandindex:"){
-            if (@lin[2] eq "1"){@emin = split( /\s+/, @lines[1+$ii] );$Emin=@emin[1]}
+        if ( @lin[1] eq "bandindex:" ) {
+            if ( @lin[2] eq "1" ) {
+                @emin = split( /\s+/, @lines[ 1 + $ii ] );
+                $Emin = @emin[1];
+            }
             print "$spin\_data_bd_$t=[";
-    	    for ($j=1; $j<$index; $j++){
-                @li = split( /\s+/, @lines[$j+$ii] );    
+            for ( $j = 1 ; $j < $index ; $j++ ) {
+                @li = split( /\s+/, @lines[ $j + $ii ] );
                 printf "[%.5f,  ", ( @li[0] ) . "  ";
-		printf "%.5f],  ", ( @li[1] ) . "  ";
-	    }
-            print "];\n";    
-	$t++;
-	}
+                printf "%.5f],  ", ( @li[1] ) . "  ";
+            }
+            print "];\n";
+            $t++;
+        }
 
         $ii++;
-	}
-    $Emax=@li[1];
+    }
+    $Emax = @li[1];
     print "data1=[";
-    for ($k=0; $k<$t; $k++){
-		print "{data : $spin\_data_bd_$k, id : 'Band_$spin $k', name : 'Band_$spin $k',showInLegend: false, linkedTo: '$spin', color: ''+lclr+'', dashStyle: '+lntpp+', lineWidth: ''+lw+''},";
+    for ( $k = 0 ; $k < $t ; $k++ ) {
+        print
+"{data : $spin\_data_bd_$k, id : 'Band_$spin $k', name : 'Band_$spin $k',showInLegend: false, linkedTo: '$spin', color: ''+lclr+'', dashStyle: '+lntpp+', lineWidth: ''+lw+''},";
     }
     print "];}\n";
-print "</script> \n";
+    print "</script> \n";
 }
-
 
 ###
-sub spinupdn{
-$spin="updn";
-print "<script> \n";
-unless(open(FILEUP,"$DIR/$CASE.bandsup.agr")) {
-	$error=1;
-}
+sub spinupdn {
+    $spin = "updn";
+    print "<script> \n";
+    unless ( open( FILEUP, "$DIR/$CASE.bandsup.agr" ) ) {
+        $error = 1;
+    }
 
-unless(open(FILEDN,"$DIR/$CASE.bandsdn.agr")) {
-	$error=1;
-}
+    unless ( open( FILEDN, "$DIR/$CASE.bandsdn.agr" ) ) {
+        $error = 1;
+    }
 
     @linesup = <FILEUP>;
     close(FILEUP);
@@ -390,7 +403,7 @@ unless(open(FILEDN,"$DIR/$CASE.bandsdn.agr")) {
     close(FILEDN);
     chomp(@linesdn);
 
-print <<EOF;
+    print <<EOF;
 function dodata_updn() { 
 lntpp="solid";
 lwup = parseFloat(document.getElementById("lwup").value);
@@ -399,142 +412,166 @@ lwdn = parseFloat(document.getElementById("lwdn").value);
 lclrdn = document.getElementById("lclrdn").value;
 efc= document.getElementById("efcc").value;
 EOF
-    $i=0;
+    $i = 0;
     for $line (@linesup) {
-	$line =~ s/^\s+//;
-	@lin = split( /\s+/, $line );    
-	if (@lin[0] eq "@" and @lin[1] eq "xaxis" and @lin[2] eq "ticklabel" and @lin[3] ne "char"){
-	@lin[4] =~ s/^.{1,2}//s;
-	    if(@lin[4] eq "G"){
-	    push (@label,"\\u0393");
-	    }else{
-	    push (@label, @lin[4]);
-	    }
-	}
+        $line =~ s/^\s+//;
+        @lin = split( /\s+/, $line );
+        if (    @lin[0] eq "@"
+            and @lin[1] eq "xaxis"
+            and @lin[2] eq "ticklabel"
+            and @lin[3] ne "char" )
+        {
+            @lin[4] =~ s/^.{1,2}//s;
+            if ( @lin[4] eq "G" ) {
+                push( @label, "\\u0393" );
+            }
+            else {
+                push( @label, @lin[4] );
+            }
+        }
 
-	if (@lin[0] eq "@" and @lin[1] eq "xaxis" and @lin[2] eq "tick" and @lin[3] eq "major" and @lin[4] ne "grid"){
-	push (@posi, @lin[5]);
-	}
+        if (    @lin[0] eq "@"
+            and @lin[1] eq "xaxis"
+            and @lin[2] eq "tick"
+            and @lin[3] eq "major"
+            and @lin[4] ne "grid" )
+        {
+            push( @posi, @lin[5] );
+        }
 
-	if (@lin[0] eq "@" and @lin[1] eq "world"){
-	chop(@lin[4]);
-	$longeur=@lin[4];
-	}
-        
-        if (@lin[1] eq "bandindex:" and @lin[2] eq "1"){
-        $index1=$i;
-        }	
+        if ( @lin[0] eq "@" and @lin[1] eq "world" ) {
+            chop( @lin[4] );
+            $longeur = @lin[4];
+        }
 
-        if (@lin[1] eq "bandindex:" and @lin[2] eq "2"){
-        $index2=$i;
-        }	  
+        if ( @lin[1] eq "bandindex:" and @lin[2] eq "1" ) {
+            $index1 = $i;
+        }
 
-    $i++
+        if ( @lin[1] eq "bandindex:" and @lin[2] eq "2" ) {
+            $index2 = $i;
+        }
+
+        $i++;
     }
-    $index=$index2-$index1-5;
-    
+    $index = $index2 - $index1 - 5;
+
     print "tkP=[";
-    foreach (@posi){
-    print " $_,";
+    foreach (@posi) {
+        print " $_,";
     }
     print "]\n";
 
     print "KL=[";
-    foreach (@label){
-    print " \"$_\",";
+    foreach (@label) {
+        print " \"$_\",";
     }
     print "]\n";
 
-    $ii=0; 
-    $t=0;
+    $ii = 0;
+    $t  = 0;
     for $line (@linesup) {
-	$line =~ s/^\s+//;
-	@lin = split( /\s+/, $line );    
+        $line =~ s/^\s+//;
+        @lin = split( /\s+/, $line );
 
-	if (@lin[1] eq "bandindex:"){
-            if (@lin[2] eq "1"){@emin = split( /\s+/, @linesup[1+$ii] );$Emin=@emin[1]}
+        if ( @lin[1] eq "bandindex:" ) {
+            if ( @lin[2] eq "1" ) {
+                @emin = split( /\s+/, @linesup[ 1 + $ii ] );
+                $Emin = @emin[1];
+            }
             print "up\_data_bd_$t=[";
-    	    for ($j=1; $j<$index; $j++){
-                @li = split( /\s+/, @linesup[$j+$ii] );    
+            for ( $j = 1 ; $j < $index ; $j++ ) {
+                @li = split( /\s+/, @linesup[ $j + $ii ] );
                 printf "[%.5f,  ", ( @li[0] ) . "  ";
-		printf "%.5f],  ", ( @li[1] ) . "  ";
-	    }
-            print "];\n";    
-	$t++;
-	}
+                printf "%.5f],  ", ( @li[1] ) . "  ";
+            }
+            print "];\n";
+            $t++;
+        }
         $ii++;
-	}
-    $Emax=@li[1];
-
-
-    $i=0;
-    for $line (@linesdn) {
-	$line =~ s/^\s+//;
-	@lin = split( /\s+/, $line );    
-	if (@lin[0] eq "@" and @lin[1] eq "xaxis" and @lin[2] eq "ticklabel" and @lin[3] ne "char"){
-	@lin[4] =~ s/^.{1,2}//s;
-	    if(@lin[4] eq "G"){
-	    push (@label,"\\u0393");
-	    }else{
-	    push (@label, @lin[4]);
-	    }
-	}
-
-	if (@lin[0] eq "@" and @lin[1] eq "xaxis" and @lin[2] eq "tick" and @lin[3] eq "major" and @lin[4] ne "grid"){
-	push (@posi, @lin[5]);
-	}
-
-	if (@lin[0] eq "@" and @lin[1] eq "world"){
-	chop(@lin[4]);
-	$longeur=@lin[4];
-	}
-        
-        if (@lin[1] eq "bandindex:" and @lin[2] eq "1"){
-        $index1=$i;
-        }	
-
-        if (@lin[1] eq "bandindex:" and @lin[2] eq "2"){
-        $index2=$i;
-        }	  
-
-    $i++
     }
-    $index=$index2-$index1-5;
+    $Emax = @li[1];
 
-    $ii=0; 
-    $t=0;
+    $i = 0;
     for $line (@linesdn) {
-	$line =~ s/^\s+//;
-	@lin = split( /\s+/, $line );    
+        $line =~ s/^\s+//;
+        @lin = split( /\s+/, $line );
+        if (    @lin[0] eq "@"
+            and @lin[1] eq "xaxis"
+            and @lin[2] eq "ticklabel"
+            and @lin[3] ne "char" )
+        {
+            @lin[4] =~ s/^.{1,2}//s;
+            if ( @lin[4] eq "G" ) {
+                push( @label, "\\u0393" );
+            }
+            else {
+                push( @label, @lin[4] );
+            }
+        }
 
-	if (@lin[1] eq "bandindex:"){
+        if (    @lin[0] eq "@"
+            and @lin[1] eq "xaxis"
+            and @lin[2] eq "tick"
+            and @lin[3] eq "major"
+            and @lin[4] ne "grid" )
+        {
+            push( @posi, @lin[5] );
+        }
+
+        if ( @lin[0] eq "@" and @lin[1] eq "world" ) {
+            chop( @lin[4] );
+            $longeur = @lin[4];
+        }
+
+        if ( @lin[1] eq "bandindex:" and @lin[2] eq "1" ) {
+            $index1 = $i;
+        }
+
+        if ( @lin[1] eq "bandindex:" and @lin[2] eq "2" ) {
+            $index2 = $i;
+        }
+
+        $i++;
+    }
+    $index = $index2 - $index1 - 5;
+
+    $ii = 0;
+    $t  = 0;
+    for $line (@linesdn) {
+        $line =~ s/^\s+//;
+        @lin = split( /\s+/, $line );
+
+        if ( @lin[1] eq "bandindex:" ) {
             print "dn\_data_bd_$t=[";
-    	    for ($j=1; $j<$index; $j++){
-                @li = split( /\s+/, @linesdn[$j+$ii] );    
+            for ( $j = 1 ; $j < $index ; $j++ ) {
+                @li = split( /\s+/, @linesdn[ $j + $ii ] );
                 printf "[%.5f,  ", ( @li[0] ) . "  ";
-		printf "%.5f],  ", ( @li[1] ) . "  ";
-	    }
-            print "];\n";    
-	$t++;
-	}
+                printf "%.5f],  ", ( @li[1] ) . "  ";
+            }
+            print "];\n";
+            $t++;
+        }
         $ii++;
-	}
+    }
 
     print "data1=[";
-    for ($k=0; $k<$t; $k++){
-		print "{data : up\_data_bd_$k, id : 'Band_up $k', name : 'Band_up $k',showInLegend: false, linkedTo: 'up', color: ''+lclrup+'', dashStyle: '+lntpp+', lineWidth: ''+lwup+''},";
-		print "{data : dn\_data_bd_$k, id : 'Band_dn $k', name : 'Band_dn $k',showInLegend: false, linkedTo: 'dn', color: ''+lclrdn+'', dashStyle: '+lntpp+', lineWidth: ''+lwdn+''},";
+    for ( $k = 0 ; $k < $t ; $k++ ) {
+        print
+"{data : up\_data_bd_$k, id : 'Band_up $k', name : 'Band_up $k',showInLegend: false, linkedTo: 'up', color: ''+lclrup+'', dashStyle: '+lntpp+', lineWidth: ''+lwup+''},";
+        print
+"{data : dn\_data_bd_$k, id : 'Band_dn $k', name : 'Band_dn $k',showInLegend: false, linkedTo: 'dn', color: ''+lclrdn+'', dashStyle: '+lntpp+', lineWidth: ''+lwdn+''},";
     }
     print "];\n";
     print "}\n";
-print "</script> \n";
+    print "</script> \n";
 }
 
 ###
 
-sub spijplot{
-print "<script> \n";
-print <<EOF;
+sub spijplot {
+    print "<script> \n";
+    print <<EOF;
 function doplot(spin,inset){
 W = \$('#resz').width();
 H = \$('#resz').height();
@@ -850,16 +887,16 @@ saveAs(new Blob([svg], {type:"application/svg+xml"}), "band.svg")
 
 \$(document).ready(function () {
 EOF
-if ($error==1){
-print <<EOF;
+    if ( $error == 1 ) {
+        print <<EOF;
 
     bootbox.alert({
         message: "Can't read file $CASE.bands(up/dn).agr, please check your calculations !",
         size: 'small',
 		});
 EOF
-}
-print <<EOF;
+    }
+    print <<EOF;
 \$(".sba").hover(
 function() {
 \$(this).fadeTo("fast",0.6);
@@ -1054,8 +1091,8 @@ saveAs(new Blob([svg], {type:"application/svg+xml"}), "band.svg")
 EOF
 }
 
-sub rest{
-print <<EOF;
+sub rest {
+    print <<EOF;
 <script>
     \$( function() {
         \$( "#slider-range-max" ).slider({
@@ -1270,8 +1307,8 @@ This can take  a few seconds ! &nbsp
                                 </div>
 EOF
 
-if($spin eq "updn"){
-print <<EOF;
+    if ( $spin eq "updn" ) {
+        print <<EOF;
                                 <div class="tab-pane fade" id="line">
 				<div class="input-group cclrup">
 			        <span class="input-group-addon">Line Color Up</span>
@@ -1304,8 +1341,9 @@ print <<EOF;
 				</div>
 
 EOF
-}else{
-print <<EOF;
+    }
+    else {
+        print <<EOF;
                                 <div class="tab-pane fade" id="line">
 				<div class="input-group cclr">
 			        <span class="input-group-addon">Line Color</span>
@@ -1322,10 +1360,9 @@ print <<EOF;
         		        <input id="lw" value="0.5" min="1" max="10" type="text" class="form-control">
 				</div>
 EOF
-}
+    }
 
-
-print <<EOF;
+    print <<EOF;
 				<hr>
 				<div class="input-group efc">
 			        <span class="input-group-addon">E<sub>F</sub></span>
@@ -1363,7 +1400,4 @@ print <<EOF;
 </body></html>\n
 EOF
 }
-
-
-
 

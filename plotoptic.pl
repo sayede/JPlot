@@ -9,180 +9,49 @@ require "../../../libs/struct.pl";
 &GetInput;
 &GetSession;
 
-$error1 = 0;
-$error2 = 0;
-$error3 = 0;
-$numdos = 0;
+@files=( "$CASE.eloss", "$CASE.epsilon", "$CASE.joint", "$CASE.sigmak" );
 
-open( FILE, "$DIR/$CASE.int" ) or $error1 = 1;
-while ( my $ligne = <FILE> ) {
-    $numdos++;
-}
-$numdos = $numdos - 3;
-close(FILE);
+#sumrul àevoir pas de head
+@Head=();
+foreach (@files){
+        @head=();
+        if (-f "$DIR/$_"){
+                open(FILE, "$DIR/$_");
+                @name = split( /\./, $_);
+                push(@head, "Energy");
+                push(@Head, $name[1]);
+                while (my $line = <FILE>) {
+                        if ($line =~ /Energy/) {
+                                $i=0;
+                                $line =~ s/^\s+//;
+                                @lin = split( /\s+/, $line);
+                                shift @lin; shift @lin;shift @lin;
+                                foreach(@lin){
+                                        push(@head, $_);
+                                        push(@Head, $_);
+                                        #$data{"$name[1]"}{"label$i"}=$_;
+                                $i++;
+                                }
+                         }
 
-open( FILE, "$DIR/$CASE.struct" ) or $error2 = 1;
-@line = <FILE>;
-foreach $line (@line) {
-    if ( $line =~ /Z:/ ) {
-        $line =~ s/^\s+//;
-        @lin = split( /\s+/, $line );
-        push( @col3, "$lin[0]" );
-    }
-}
-close(FILE);
-
-$nat = @col3;
-opendir( $dir, $DIR ) or die "can't opendir $DIR: $!";
-foreach ( grep { !/^\.\.?$/ } ( sort readdir $dir ) ) {
-    if ( $_ =~ /dos/ and $_ =~ /ev/ and $_ =~ /up/ ) {
-        push( @fileup, "$_" );
-    }
-    elsif ( $_ =~ /dos/ and $_ =~ /ev/ and $_ =~ /dn/ ) {
-        push( @filedn, "$_" );
-    }
-    elsif ( $_ =~ /dos/ and $_ =~ /ev/ and ( $_ != ~/dn/ or $_ != ~/up/ ) ) {
-        push( @file, "$_" );
-    }
-}
-
-@ENE  = ();
-@head = ();
-
-if ( $spinpol =~ /CHECKED/ ) {
-
-    %dataup = ();
-    %datadn = ();
-
-    $selspin =
-'<select style="width:auto" class="form-control" id="selspin"><option active="" value="Up">Up</option><option active="" value="Dn">Dn</option><option active="" value="UpDn">Up+Dn</option></select>';
-    $filene = "$DIR/@fileup[0]";
-
-    foreach (@fileup) {
-        open( FILE, "$DIR/$_" ) or $error3 = 1;
-        @line = <FILE>;
-        shift @line;
-        shift @line;
-        @line[0] =~ s/^\s+//;
-        @lin = split( /\s+/, @line[0] );
-        shift @lin;
-        shift @lin;
-
-        foreach (@lin) {
-            if ( $_ eq "total-DOS" ) {
-                push( @head, "Total_DOS" );
-            }
-            else {
-                @li = split( /:/, $_ );
-                push( @head, @col3[ @li[0] - 1 ] . "_" . @li[1] );
-            }
-        }
+                         if ($line !~ /\#/) {
+                                $line =~ s/^\s+//;
+                                @lin = split( /\s+/, $line);
+                                $j=0;
+                                foreach (@head){
+                                push( @{ $data{"$name[1]"}{"$_"}}, $lin[$j]);
+                                $j++;
+                                }
+                         }
+                }
         close(FILE);
-    }
-
-    $k = 0;
-    foreach (@fileup) {
-        open( FILE, "$DIR/$_" ) or die "Can't open `$_': $!";
-        @line = <FILE>;
-        shift @line;
-        shift @line;
-        shift @line;
-        foreach (@line) {
-            $_ =~ s/^\s+//;
-            @lin = split( /\s+/, $_ );
-            $s = @lin;
-            for ( $y = 1 ; $y < $s ; $y++ ) {
-                push @{ $dataup{ $head[ $y - 1 + $k ] } }, @lin[$y];
-            }
         }
-        $k = $k + 7;
-    }
-
-    $k = 0;
-    foreach (@filedn) {
-        open( FILE, "$DIR/$_" ) or $error3 = 1;    #die "Can't open `$_': $!";
-        @line = <FILE>;
-        shift @line;
-        shift @line;
-        shift @line;
-
-        foreach (@line) {
-            $_ =~ s/^\s+//;
-            @lin = split( /\s+/, $_ );
-            $s = @lin;
-            for ( $y = 1 ; $y < $s ; $y++ ) {
-                push @{ $datadn{ $head[ $y - 1 + $k ] } }, @lin[$y];
-            }
-        }
-
-        $k = $k + 7;
-    }
-
-}
-else {
-
-    %data   = ();
-    $filene = "$DIR/@file[0]";
-
-    foreach (@file) {
-        open( FILE, "$DIR/$_" ) or $error3 = 1;
-        @line = <FILE>;
-        shift @line;
-        shift @line;
-        @line[0] =~ s/^\s+//;
-        @lin = split( /\s+/, @line[0] );
-        shift @lin;
-        shift @lin;
-
-        foreach (@lin) {
-            if ( $_ eq "total-DOS" ) {
-                push( @head, "Total_DOS" );
-            }
-            else {
-                @li = split( /:/, $_ );
-                push( @head, @col3[ @li[0] - 1 ] . "_" . @li[1] );
-            }
-        }
-        close(FILE);
-    }
-
-    $k = 0;
-    foreach (@file) {
-        open( FILE, "$DIR/$_" ) or $error3 = 1;    #die "Can't open `$_': $!";
-        @line = <FILE>;
-        shift @line;
-        shift @line;
-        shift @line;
-
-        foreach (@line) {
-            $_ =~ s/^\s+//;
-            @lin = split( /\s+/, $_ );
-            $s = @lin;
-            for ( $y = 1 ; $y < $s ; $y++ ) {
-                push @{ $data{ $head[ $y - 1 + $k ] } }, @lin[$y];
-
-            }
-        }
-
-        $k = $k + 7;
-    }
 
 }
 
-open( FILE, $filene ) or $error3 = 1;
-@line = <FILE>;
-shift @line;
-shift @line;
-shift @line;
-foreach (@line) {
-    $_ =~ s/^\s+//;
-    @lin = split( /\s+/, $_ );
-    $s = @lin;
-    push( @ENE, @lin[0] );
-    $k++;
-}
 
 print "Content-type: text/html\n\n";
+
 print <<EOF;
 <html><head>
 <style type="text/css" media="all">
@@ -242,7 +111,7 @@ padding-right:28px;
 	    <div class="row" >
 		 <div class="col-lg-3">
 		 <table ><tr >
-		 <td ><h4>Density of states</h4></td><td>&nbsp</td>
+		 <td ><h4>Optical properties</h4></td><td>&nbsp</td>
 		 <td >
 		    <a href="#" data-toggle="tooltip" title="About JPlot">
                             <img src="images/about.png" class="sba img-responsive" alt="Cinque Terre" width="20" height="20"></a>
@@ -300,8 +169,13 @@ Plot type:
 		<table class="table borderless" style="border:0px; margin-bottom: 0;"><tr>
 		    <td style="border:0px"><table>	<tr><td id="td1" class="bloc"><select class="input-sm dosval" multiple style="height: 320px;" id="dosori">
 EOF
-foreach (@head) {
-    print "<OPTION VALUE=\"$_\"><small>$_</small></OPTION>";
+foreach (@Head){
+ if ($_ !~ /\_/) {
+	print "<optgroup label=\"$_\">";
+	$group=$_;
+ }else{
+	print "<OPTION VALUE=\"$group.$_\"><small>$_</small></OPTION>";
+ }
 }
 
 print <<EOF;
@@ -313,7 +187,7 @@ print <<EOF;
 <ul class="nav nav-pills">
     <li class="active"><a aria-expanded="true" href="#energie" data-toggle="tab">Energies</a>
     </li>
-    <li><a aria-expanded="true" href="#dos" data-toggle="tab">DOS</a>
+    <li><a aria-expanded="true" href="#dos" data-toggle="tab">Y-axis</a>
     </li>
     <li class=""><a aria-expanded="false" href="#font" data-toggle="tab">Font</a>
     </li>
@@ -550,26 +424,6 @@ Highcharts.wrap(Highcharts.Axis.prototype, 'getLinePath', function (proceed, lin
         xAxis: {
 	    max:Emax,
 	    min:Emin,
-	     plotLines: [{
-                dashStyle: 'dash',
-                color: '#FF0000',
-                width: 1,
-                value: 0,
-                label: {
-                    verticalAlign: 'top',
-                    textAlign: 'center',
-                    y : 10,
-                    x : 10,
-                    rotation: 0,
-                    style: {
-                    fontSize: '14px',
-                    font: 'Helvetica, Verdana, sans-serif',
-                    color: '#FF0000',
-                    },
-                    useHTML: true,
-                    text: 'E<sub>F</sub>'
-                }
-            }],
 	    title: {
 		margin: 0,
                 enabled: true,
@@ -616,7 +470,7 @@ Highcharts.wrap(Highcharts.Axis.prototype, 'getLinePath', function (proceed, lin
             }],
 	    title: {
                 enabled: true,
-                text: 'DOS (States/eV)',
+                text: '',
                 style: {
                     fontSize: tsize,
                     font: 'Helvetica, Verdana, sans-serif',
@@ -706,19 +560,19 @@ if (nlayer=="d" && o==1) {chart.xAxis[0].setTitle({text:''})}
 if (nlayer=="d" && o==2) {chart.xAxis[0].setTitle({text:'Energy (eV)'})}
 if (nlayer=="e" && o==1) {chart.xAxis[0].setTitle({text:''})}
 if (nlayer=="e" && o==2) {chart.xAxis[0].setTitle({text:''}); chart.yAxis[0].setTitle({text:''})}
-if (nlayer=="e" && o==3) {chart.xAxis[0].setTitle({text:'Energy (eV)'}); chart.yAxis[0].setTitle({text:'DOS (States/eV)'})}
+if (nlayer=="e" && o==3) {chart.xAxis[0].setTitle({text:'Energy (eV)'}); chart.yAxis[0].setTitle({text:''})}
 if (nlayer=="e" && o==4) {chart.xAxis[0].setTitle({text:'Energy (eV)'}); chart.yAxis[0].setTitle({text:''})}
-if (nlayer=="f" && o==1) {chart.xAxis[0].setTitle({text:''}); chart.yAxis[0].setTitle({text:'DOS (States/eV)'})}
+if (nlayer=="f" && o==1) {chart.xAxis[0].setTitle({text:''}); chart.yAxis[0].setTitle({text:''})}
 if (nlayer=="f" && o==2) {chart.xAxis[0].setTitle({text:''}); chart.yAxis[0].setTitle({text:''})}
 if (nlayer=="f" && o==3) {chart.xAxis[0].setTitle({text:''}); chart.yAxis[0].setTitle({text:''})}
-if (nlayer=="f" && o==4) {chart.xAxis[0].setTitle({text:'Energy (eV)'}); chart.yAxis[0].setTitle({text:'DOS (States/eV)'})}
+if (nlayer=="f" && o==4) {chart.xAxis[0].setTitle({text:'Energy (eV)'}); chart.yAxis[0].setTitle({text:''})}
 if (nlayer=="f" && o==5) {chart.xAxis[0].setTitle({text:'Energy (eV)'}); chart.yAxis[0].setTitle({text:''})}
 if (nlayer=="f" && o==6) {chart.xAxis[0].setTitle({text:'Energy (eV)'}); chart.yAxis[0].setTitle({text:''})}
-if (nlayer=="g" && o==1) {chart.xAxis[0].setTitle({text:''}); chart.yAxis[0].setTitle({text:'DOS (States/eV)'})}
+if (nlayer=="g" && o==1) {chart.xAxis[0].setTitle({text:''}); chart.yAxis[0].setTitle({text:''})}
 if (nlayer=="g" && o==2) {chart.xAxis[0].setTitle({text:''}); chart.yAxis[0].setTitle({text:''})}
-if (nlayer=="g" && o==3) {chart.xAxis[0].setTitle({text:''}); chart.yAxis[0].setTitle({text:'DOS (States/eV)'})}
+if (nlayer=="g" && o==3) {chart.xAxis[0].setTitle({text:''}); chart.yAxis[0].setTitle({text:''})}
 if (nlayer=="g" && o==4) {chart.xAxis[0].setTitle({text:''}); chart.yAxis[0].setTitle({text:''})}
-if (nlayer=="g" && o==5) {chart.xAxis[0].setTitle({text:'Energy (eV)'}); chart.yAxis[0].setTitle({text:'DOS (States/eV)'})}
+if (nlayer=="g" && o==5) {chart.xAxis[0].setTitle({text:'Energy (eV)'}); chart.yAxis[0].setTitle({text:''})}
 if (nlayer=="g" && o==6) {chart.xAxis[0].setTitle({text:'Energy (eV)'}); chart.yAxis[0].setTitle({text:''})}
 
 
@@ -778,7 +632,7 @@ for(r = 0; r < x; r++){
     t += h;
 }
 svg= '<svg height="'+ t +'" width="' + l + '" version="1.1" xmlns="http://www.w3.org/2000/svg">' + svgArr.join('') + '</svg>';
-saveAs(new Blob([svg], {type:"application/svg+xml"}), "dos.svg")
+saveAs(new Blob([svg], {type:"application/svg+xml"}), "optic.svg")
 })
 
 \$('<button class="btn btn-success">PNG</button>').appendTo(figrr).click(function (e) {
@@ -810,10 +664,10 @@ canvg(canvas, svg, {ignoreDimensions: true, scaleWidth: canvas.width, scaleHeigh
 var isChrome = window.chrome;
 if(isChrome) {
 dospng = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-saveAs(dospng, "dos.png");
+saveAs(dospng, "optic.png");
 }else{
 canvas.toBlob(function(blob) {
-saveAs(blob, "dos.png", 'image/png');
+saveAs(blob, "optic.png", 'image/png');
 });
 }
 })
@@ -845,59 +699,25 @@ for(r = 0; r < x; r++){
 }
 
 function dodata(nlay) {
-
-spin = \$('#selspin').val(); 
-if (spin=="Up"){inv=1}
-if (spin=="Dn"){inv=1}
-if (spin=="UpDn"){inv=-1}
-
 var h = new Object()
 EOF
-$s  = @head;
-$ss = @ENE;
 
-if ( $spinpol =~ /CHECKED/ ) {
 
-    for ( $m = 0 ; $m < $s ; $m++ ) {
-        $k = 0;
-        print "h['@head[$m]_up']=[";
-        foreach (@ENE) {
-            print "[@ENE[$k],@{$dataup{@head[$m]}}[$k]],";
-            $k++;
-        }
-        print "]\n";
-        print <<EOF;
-EOF
+for $key1 ( keys %data ) {
+   #print "$key1 \n";
+    for $key2 ( keys %{ $data{$key1} } ) {
+                 if ($key2 ne "Energy"  ){print "h[\"$key1.$key2\"] = ["};
+                $k=0;
+                foreach (@{$data{$key1}{$key2}}) {
+                if ($key2 ne "Energy"  ){print "[@{$data{$key1}{\"Energy\"}}[$k],$_],";}
+                $k++;
+                }
+     if ($key2 ne "Energy"  ){print "]\n";}
     }
-
-    for ( $m = 0 ; $m < $s ; $m++ ) {
-        $k = 0;
-        print "h['@head[$m]_dn']=[";
-        foreach (@ENE) {
-            print "[@ENE[$k],@{$datadn{@head[$m]}}[$k]*inv],";
-            $k++;
-        }
-        print "]\n";
-        print <<EOF;
-EOF
-    }
-
+    print "\n";
 }
-else {
 
-    for ( $m = 0 ; $m < $s ; $m++ ) {
-        $k = 0;
-        print "h['@head[$m]']=[";
-        foreach (@ENE) {
-            print "[@ENE[$k],@{$data{@head[$m]}}[$k]],";
-            $k++;
-        }
-        print "]\n";
-        print <<EOF;
-EOF
-    }
 
-}
 
 print <<EOF;
 
@@ -907,32 +727,19 @@ for(i=0; i < x.options.length; i++){
       doslabel = x.options[i].value;
       if (doslabel.substring(0, 4) == 'Plot') continue;
       if (doslabel.length == 0) continue;
+ 
+      linename = doslabel.split(".");
 
       eval('color=\$("#clr'+doslabel+'").text()')
       eval('style=\$("#style'+doslabel+'").text()')
+      eval('data.push({name: "'+linename[1]+'", data: h[doslabel],color:"'+color+'",dashStyle:"'+style+'"})');
 
-      if (\$('#selspin').length) {	
-        
-	spin = \$('#selspin').val(); 
-	    if (spin=="Up"){
-            eval('data.push({name: "'+doslabel+'", data: h[doslabel+"_up"],color:"'+color+'",dashStyle:"'+style+'"})');
-	    }
-	    if (spin=="Dn"){
-	    eval('data.push({name: "'+doslabel+'", data: h[doslabel+"_dn"],color:"'+color+'",dashStyle:"'+style+'"})');
-	    }
-	    if (spin=="UpDn"){
-            eval('data.push({name: "'+doslabel+'", data: h[doslabel+"_up"],color:"'+color+'",dashStyle:"'+style+'"})');
-            eval('data.push({data: h[doslabel+"_dn"],color:"'+color+'",dashStyle:"'+style+'",  showInLegend: false, linkedTo: ":previous"})');
-	    }
-      }else{
-    	    eval('data.push({name: "'+doslabel+'", data: h[doslabel],color:"'+color+'",dashStyle:"'+style+'"})');
-
-      }
 }
 }
 
 
 function insertdos(n){
+
 var ins = document.getElementById("dosori").value;
 var option=document.createElement("option");
 var x=document.getElementById('dos2'+n+'');
@@ -942,21 +749,29 @@ if (ins.length == 0 ){
 return;
 }
 
-option.text=ins;
-try
-  {
-   x.add(option,x.options[null]);
-   }
-   catch (e)
-   {
-   x.add(option,null);
-   }
+
+
+var file = ins.split(".");
+if(\$('#dos2'+n+' optgroup[label="'+file[0]+'"]').length == 0) {
+    \$('#dos2'+n+'').append('<optgroup label="'+file[0]+'"></optgroup>');
+    \$('#dos2'+n+' optgroup[label="'+file[0]+'"]').append('<option value="'+ins+'">'+file[1]+'</option>');
+}else{
+    \$('#dos2'+n+' optgroup[label="'+file[0]+'"]').append('<option value="'+ins+'">'+file[1]+'</option>');
+}
+
+
+
 
 y.remove(y.selectedIndex);
 colors = ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'];
 if ((x.length-1)>7){ord=Math.round((x.length-1)/7)}else{ord=x.length-1}
 eval('color=colors['+ord+']')
 \$('<p id=\"clr'+ins+'\" style="display:none">'+color+'</p><p id=\"style'+ins+'\" style="display:none">solid</p><p id=\"lw'+ins+'\" style="display:none">1</p>').appendTo('#layer'+n+'')
+
+
+if (\$('#dosori optgroup[label="'+file[0]+'"]').find('option').length == 0){ 
+        \$('#dosori optgroup[label="'+file[0]+'"]').remove(); 
+}
 
 }
 
@@ -970,21 +785,23 @@ if (ins.substring(0, 4) == 'Plot' ||  ins.length == 0 ){
 return;
 }
 
-option.text=ins;
-try
-  {
-   y.add(option,y.options[null]);
-   }
-   catch (e)
-   {
-   y.add(option,null);
-   }
+var file = ins.split(".");
+if(\$('#dosori optgroup[label="'+file[0]+'"]').length == 0) {
+    \$('#dosori').append('<optgroup label="'+file[0]+'"></optgroup>');
+    \$('#dosori optgroup[label="'+file[0]+'"]').append('<option value="'+ins+'">'+file[1]+'</option>');
+}else{
+    \$('#dosori optgroup[label="'+file[0]+'"]').append('<option value="'+ins+'">'+file[1]+'</option>');
+}
+
 
 x.remove(x.selectedIndex);
-
 \$('#clr'+ins+'\').remove()
 \$('#style'+ins+'\').remove()
 \$('#lw'+ins+'\').remove()
+
+if (\$('#dos2'+n+' optgroup[label="'+file[0]+'"]').find('option').length == 0){ 
+        \$('#dos2'+n+' optgroup[label="'+file[0]+'"]').remove(); 
+}
 
 }
 
@@ -993,35 +810,6 @@ x.remove(x.selectedIndex);
 \$(document).ready(function () {
 EOF
 
-if ( $error1 == 1 ) {
-    print <<EOF;
-
-    bootbox.alert({
-        message: "Can't read file $CASE.int, please check your files !",
-        size: 'small',
-                });
-EOF
-}
-
-if ( $error2 == 1 ) {
-    print <<EOF;
-
-    bootbox.alert({
-        message: "Can't read file $CASE.struct, please check your files !",
-        size: 'small',
-                });
-EOF
-}
-
-if ( $error3 == 1 ) {
-    print <<EOF;
-
-    bootbox.alert({
-        message: "Can't read file $CASE.dos(1/2/3)ev(up/dn), please check your calculations !",
-        size: 'small',
-                });
-EOF
-}
 print <<EOF;
 \$(".sba").hover(
 function() {
@@ -1074,11 +862,11 @@ className: "btn-success",
     });
 
 
-nat=$nat;
+//nat=$nat;
 label=[
 EOF
-foreach (@col3) {
-    print "\'$_\',";
+foreach (@col3){
+print "\'$_\',";
 }
 print <<EOF;
 ];
@@ -1215,4 +1003,7 @@ function isNumeric(num) {
 </script>
 </body></html>\n
 EOF
+
+
+
 
