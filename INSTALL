@@ -6,6 +6,7 @@
 
 
 liendos="'JPlot/plotdos.pl?SID=\$SID'";
+lienoptic="'JPlot/plotoptic.pl?SID=\$SID'";
 lienband="'JPlot/plotband.pl?SID=\$SID'";
 
 if [ -z ${WIENROOT+x} ]; then 
@@ -35,6 +36,12 @@ if [[ $resp1 =~ ^([yY][eE][sS]|[yY])$ ]]; then
 	cp -a * $ROOTJP/.;
 	rm $ROOTJP/INSTALL;
 
+	if [ ! -f $ROOTJP/../optic.pl_save ]; then
+	    cp $ROOTJP/../optic.pl $ROOTJP/../optic.pl_save
+	else
+	    cp $ROOTJP/../optic.pl_save $ROOTJP/../optic.pl
+	fi
+
 	if [ ! -f $ROOTJP/../dos.pl_save ]; then
 	    cp $ROOTJP/../dos.pl $ROOTJP/../dos.pl_save
 	else
@@ -50,6 +57,12 @@ if [[ $resp1 =~ ^([yY][eE][sS]|[yY])$ ]]; then
 	sed '/<INPUT TYPE=SUBMIT VALUE="dosplot">/a or <button type="button" onclick=\"window.open\('$liendos'\)\">JPlot<\/button>' $ROOTJP/../dos.pl > $ROOTJP/../tmp;
 	mv $ROOTJP/../tmp $ROOTJP/../dos.pl; 
 	chmod +x $ROOTJP/../dos.pl;
+
+
+	sed '/<INPUT TYPE=SUBMIT VALUE="opticplot">/a or <button type="button" onclick=\"window.open\('$lienoptic'\)\">JPlot<\/button>' $ROOTJP/../optic.pl > $ROOTJP/../tmp;
+	mv $ROOTJP/../tmp $ROOTJP/../optic.pl; 
+	chmod +x $ROOTJP/../optic.pl;
+
 
 	sed '/<INPUT TYPE=SUBMIT VALUE="plot bandstructure">/a or <button type="button" onclick=\"window.open\('$lienband'\)\">JPlot<\/button>' $ROOTJP/../band.pl > $ROOTJP/../tmp;
 	mv $ROOTJP/../tmp $ROOTJP/../band.pl; 
