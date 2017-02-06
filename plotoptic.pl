@@ -29,7 +29,6 @@ foreach (@files){
                                 foreach(@lin){
                                         push(@head, $_);
                                         push(@Head, $_);
-                                        #$data{"$name[1]"}{"label$i"}=$_;
                                 $i++;
                                 }
                          }
@@ -46,16 +45,29 @@ foreach (@files){
                 }
         close(FILE);
         }
-
 }
 
+@sumr=("Energy","1","2","3","4","5","6");
+if (-f "$DIR/$CASE.sumrules"){
+		                open(FILE, "$DIR/$CASE.sumrules");
+		                while (my $line = <FILE>) {    
+            				                    $line =~ s/^\s+//;
+                            				    @lin = split( /\s+/, $line);
+							    $j=0;
+							    foreach(@sumr){
+					                                    push( @{$data2{"$_"}}, $lin[$j]);
+                                    					    $j++;
+									 }
+                    					    }
+			     }
+			    
 
 print "Content-type: text/html\n\n";
 
 print <<EOF;
 <html><head>
+<meta charset="utf-8" />
 <style type="text/css" media="all">
-
 .bloc { display:inline-block; vertical-align:top; overflow:hidden; border:solid #4cae4c 2px; }
 .bloc select { padding:10px; margin:-5px -20px -5px -5px; }
 .layers button.XLS {    display: none;}
@@ -128,7 +140,6 @@ Plot type:
 <button id="spline" class="btn btn-success">Spline</button>
 <button id="area" class="btn btn-success">Area</button>
 <button id="areaspline" class="btn btn-success">Areaspline</button>
-<button id="scatter" class="btn btn-success">Scatter</button>
 </div>
 </td>
 <td  style="border:0px;">
@@ -167,7 +178,7 @@ Plot type:
 
 	    <div class="modal-body row">
 		<table class="table borderless" style="border:0px; margin-bottom: 0;"><tr>
-		    <td style="border:0px"><table>	<tr><td id="td1" class="bloc"><select class="input-sm dosval" multiple style="height: 320px;" id="dosori">
+		    <td style="border:0px"><table>	<tr><td id="td1" class="bloc"><select class="input-sm dosval" multiple style="height: 370px;" id="dosori">
 EOF
 foreach (@Head){
  if ($_ !~ /\_/) {
@@ -179,6 +190,15 @@ foreach (@Head){
 }
 
 print <<EOF;
+<optgroup label="sumrules">
+<option value="sumrules.1" >1</option>
+<option value="sumrules.2" >2</option>
+<option value="sumrules.3" >3</option>
+<option value="sumrules.4" >4</option>
+<option value="sumrules.5" >5</option>
+<option value="sumrules.6" >6</option>
+
+</optgroup>
 		    </select></td><td id="mlayer"></td></tr></table></td>
 		    <td style="border:0px">
 
@@ -358,14 +378,10 @@ Highcharts.wrap(Highcharts.Axis.prototype, 'getLinePath', function (proceed, lin
                     events: {
                         click: function(event) {
                                 myserie=this
-                                if(myserie.name.includes("Tot")){
-                                Name=myserie.name.replace(/ /g,"_")
-                                }else{
-                                Name=myserie.name.replace(/ /g,"__")
-                                }
-			        eval('lw=\$("#lw'+Name+'").text()')
-    				eval('style=\$("#style'+Name+'").text()')
-
+                                Name=myserie.name.split('.').join("")
+                                Name=myserie.name.split('_').join("")
+			        eval("lw=\$('#lw'+Name+'').val()")
+    				eval("style=\$('#style'+Name+'').val()")
                                  bootbox.dialog({
                                      title: ''+myserie.name+'',
                                      message: '<div class="row"> ' +
@@ -704,7 +720,6 @@ EOF
 
 
 for $key1 ( keys %data ) {
-   #print "$key1 \n";
     for $key2 ( keys %{ $data{$key1} } ) {
                  if ($key2 ne "Energy"  ){print "h[\"$key1.$key2\"] = ["};
                 $k=0;
@@ -717,6 +732,19 @@ for $key1 ( keys %data ) {
     print "\n";
 }
 
+
+
+for $key1 ( keys %data2 ) {
+    if ($key1 ne "Energy"  ){print "h[\"sumrules.$key1\"] = ["};{
+	$k=0;
+	foreach (@{$data2{$key1}}) {
+	        if ($key1 ne "Energy"  ){print "[@{$data2{\"Energy\"}}[$k],$_],";}
+    	        $k++;
+    	        }
+    }
+    if ($key1 ne "Energy"  ){print "]\n"};
+
+}
 
 
 print <<EOF;
@@ -732,8 +760,11 @@ for(i=0; i < x.options.length; i++){
 
       eval('color=\$("#clr'+doslabel+'").text()')
       eval('style=\$("#style'+doslabel+'").text()')
-      eval('data.push({name: "'+linename[1]+'", data: h[doslabel],color:"'+color+'",dashStyle:"'+style+'"})');
-
+      if (linename[0]!="joint"){
+    	    eval('data.push({name: "'+linename[1]+'", data: h[doslabel],color:"'+color+'",dashStyle:"'+style+'"})');
+      }else{
+    	    eval('data.push({name: "'+linename[0]+'_'+linename[1]+'", data: h[doslabel],color:"'+color+'",dashStyle:"'+style+'"})');
+	    }
 }
 }
 
@@ -766,8 +797,19 @@ y.remove(y.selectedIndex);
 colors = ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'];
 if ((x.length-1)>7){ord=Math.round((x.length-1)/7)}else{ord=x.length-1}
 eval('color=colors['+ord+']')
-\$('<p id=\"clr'+ins+'\" style="display:none">'+color+'</p><p id=\"style'+ins+'\" style="display:none">solid</p><p id=\"lw'+ins+'\" style="display:none">1</p>').appendTo('#layer'+n+'')
 
+ins1=ins.split('.');
+
+if(ins1[0]=="joint"){
+ins2=ins1[1].split('_').join("");
+ins2="joint"+ins2
+}else{
+ins2=ins1[1	].split('_').join("");
+}
+
+if(\$('#'+ins2+'').length==0 ){
+\$('<div id=\"'+ins2+'\" style="display:none"><input id=\"clr'+ins2+'\" style="display:none" value="'+color+'"><input id=\"style'+ins2+'\" style="display:none" value="solid"><input id=\"lw'+ins2+'\" style="display:none" value="1"></div>').appendTo('#layer'+n+'')
+}
 
 if (\$('#dosori optgroup[label="'+file[0]+'"]').find('option').length == 0){ 
         \$('#dosori optgroup[label="'+file[0]+'"]').remove(); 
@@ -793,11 +835,7 @@ if(\$('#dosori optgroup[label="'+file[0]+'"]').length == 0) {
     \$('#dosori optgroup[label="'+file[0]+'"]').append('<option value="'+ins+'">'+file[1]+'</option>');
 }
 
-
 x.remove(x.selectedIndex);
-\$('#clr'+ins+'\').remove()
-\$('#style'+ins+'\').remove()
-\$('#lw'+ins+'\').remove()
 
 if (\$('#dos2'+n+' optgroup[label="'+file[0]+'"]').find('option').length == 0){ 
         \$('#dos2'+n+' optgroup[label="'+file[0]+'"]').remove(); 
@@ -967,7 +1005,7 @@ for(var i = 1; i <=imax ; i++){
 \$('#mlayer').append('<div class="tlay" id="tlayer'+i+'" style="display:none; border: 0px solid #337AB7"></div>');
 \$('#tlayer'+i+'').append('<table><tr><td id="td2'+i+'"></td><td id="td3'+i+'" class="bloc"></td></tr></table>');
 \$('#td2'+i+'').append('<div class="btn-group" style="padding:5px;"><table><tr><td><button type="button" class="btn-xs btn-success" onclick="insertdos('+i+')"><font size="3">&#8594;</font></button></td></tr><tr><td><button type="button" class="btn-xs btn-danger" onclick="rinsertdos('+i+')"><font size="3">&#8592;</font></button></td></tr></table></div>')
-\$('#td3'+i+'').append('<select  multiple class="input-sm dosval" style="height: 320px;" id="dos2'+i+'" size="10"><option style="color: #000; background-color:#EFE883 " >Plot '+i+'</option></select>')
+\$('#td3'+i+'').append('<select  multiple class="input-sm dosval" style="height: 370px;" id="dos2'+i+'" size="10"><option style="color: #000; background-color:#EFE883 " >Plot '+i+'</option></select>')
 
 
 \$('#dos').append('<div class="form-group input-group tlay" style="display:none" id="dosvarmin'+i+'"><span class="input-group-addon">Min '+i+'</span><input class="form-control" id="dosmin'+i+'" value="" type="text"></div><div class="form-group input-group tlay" style="display:none"  id="dosvarmax'+i+'"><span class="input-group-addon">Max '+i+'</span><input class="form-control" id="dosmax'+i+'" value="" type="text"></div>')

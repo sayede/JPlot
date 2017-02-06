@@ -185,8 +185,8 @@ foreach (@line) {
 print "Content-type: text/html\n\n";
 print <<EOF;
 <html><head>
+<meta charset="utf-8" />
 <style type="text/css" media="all">
-
 .bloc { display:inline-block; vertical-align:top; overflow:hidden; border:solid #4cae4c 2px; }
 .bloc select { padding:10px; margin:-5px -20px -5px -5px; }
 .layers button.XLS {    display: none;}
@@ -259,7 +259,6 @@ Plot type:
 <button id="spline" class="btn btn-success">Spline</button>
 <button id="area" class="btn btn-success">Area</button>
 <button id="areaspline" class="btn btn-success">Areaspline</button>
-<button id="scatter" class="btn btn-success">Scatter</button>
 </div>
 </td>
 <td  style="border:0px;">
@@ -489,8 +488,8 @@ Highcharts.wrap(Highcharts.Axis.prototype, 'getLinePath', function (proceed, lin
                                 }else{
                                 Name=myserie.name.replace(/ /g,"__")
                                 }
-			        eval('lw=\$("#lw'+Name+'").text()')
-    				eval('style=\$("#style'+Name+'").text()')
+			        eval('lw=\$("#lw'+Name+'").val()')
+    				eval('style=\$("#style'+Name+'").val()')
 
                                  bootbox.dialog({
                                      title: ''+myserie.name+'',
@@ -956,7 +955,7 @@ y.remove(y.selectedIndex);
 colors = ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'];
 if ((x.length-1)>7){ord=Math.round((x.length-1)/7)}else{ord=x.length-1}
 eval('color=colors['+ord+']')
-\$('<p id=\"clr'+ins+'\" style="display:none">'+color+'</p><p id=\"style'+ins+'\" style="display:none">solid</p><p id=\"lw'+ins+'\" style="display:none">1</p>').appendTo('#layer'+n+'')
+\$('<input id=\"clr'+ins+'\" style="display:none" value="'+color+'"><input id=\"style'+ins+'\" style="display:none" value="solid"><input id=\"lw'+ins+'\" style="display:none" value="1">').appendTo('#layer'+n+'')
 
 }
 

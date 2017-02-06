@@ -8,6 +8,8 @@
 liendos="'JPlot/plotdos.pl?SID=\$SID'";
 lienoptic="'JPlot/plotoptic.pl?SID=\$SID'";
 lienband="'JPlot/plotband.pl?SID=\$SID'";
+lienrho="'JPlot/plotdensity.pl?SID=\$SID'";
+
 
 if [ -z ${WIENROOT+x} ]; then 
     echo "WIENROOT is unset ! Please give the WIEN2K root ?"; 
@@ -54,6 +56,14 @@ if [[ $resp1 =~ ^([yY][eE][sS]|[yY])$ ]]; then
 	    cp $ROOTJP/../band.pl_save $ROOTJP/../band.pl
 	fi
 
+	if [ ! -f $ROOTJP/../rho.pl_save ]; then
+	    cp $ROOTJP/../rho.pl $ROOTJP/../rho.pl_save
+	else
+	    cp $ROOTJP/../rho.pl_save $ROOTJP/../rho.pl
+	fi
+
+
+
 	sed '/<INPUT TYPE=SUBMIT VALUE="dosplot">/a or <button type="button" onclick=\"window.open\('$liendos'\)\">JPlot<\/button>' $ROOTJP/../dos.pl > $ROOTJP/../tmp;
 	mv $ROOTJP/../tmp $ROOTJP/../dos.pl; 
 	chmod +x $ROOTJP/../dos.pl;
@@ -67,6 +77,11 @@ if [[ $resp1 =~ ^([yY][eE][sS]|[yY])$ ]]; then
 	sed '/<INPUT TYPE=SUBMIT VALUE="plot bandstructure">/a or <button type="button" onclick=\"window.open\('$lienband'\)\">JPlot<\/button>' $ROOTJP/../band.pl > $ROOTJP/../tmp;
 	mv $ROOTJP/../tmp $ROOTJP/../band.pl; 
 	chmod +x $ROOTJP/../band.pl;
+
+
+	sed '/<INPUT TYPE=SUBMIT VALUE="rhoplot">/a or <button type="button" onclick=\"window.open\('$lienrho'\)\">JPlot<\/button>' $ROOTJP/../rho.pl > $ROOTJP/../tmp;
+	mv $ROOTJP/../tmp $ROOTJP/../rho.pl; 
+	chmod +x $ROOTJP/../rho.pl;
 
 
 	echo "Done";

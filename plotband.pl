@@ -12,6 +12,7 @@ $error = 0;
 print "Content-type: text/html\n\n";
 print <<EOF;
 <html><head>
+<meta charset="utf-8" />
 <link rel="stylesheet" href="/exec/JPlot/bootstrap.min.css">
 <link rel="stylesheet" href="/exec/JPlot/font-awesome.min.css">
 <link rel="stylesheet" href="/exec/JPlot/bootstrap-colorpicker.min.css">
