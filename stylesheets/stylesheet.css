@@ -328,6 +328,11 @@ Full-Width Styles
   box-shadow: 0 0 0px #ebebeb;
 }
 
+.jploth {
+ position: absolute;
+  top : -20px;
+}
+
 #downloads {
   position: absolute;
   width: 210px;
