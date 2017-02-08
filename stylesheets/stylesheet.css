@@ -315,6 +315,20 @@ Full-Width Styles
   text-shadow: #111 0px 0px 10px;
 }
 
+  #jplot {
+  position: absolute;
+  width: 60px;
+  z-index: 10;
+  bottom: -10px;
+  left: 0;
+  height: 60px;
+  }
+
+.jplot_icon {
+ border: 0px solid #ebebeb;
+  box-shadow: 0 0 0px #ebebeb;
+}
+
 #downloads {
   position: absolute;
   width: 210px;
