@@ -317,9 +317,9 @@ Full-Width Styles
 
   #jplot {
   position: absolute;
-  width: 60px;
+  width: 120px;
   z-index: 10;
-  bottom: 20px;
+  top : 20px;
   left: 5;
   height: 60px;
   }
