@@ -13,7 +13,7 @@ This will add two buttons to the w2web interface, one in the bandstructure task 
 
 ### Usage 
 
-The [wiki](https://github.com/sayede/JPlot/wiki) has a set of example plots made with JSplot.
+The [wiki](https://github.com/sayede/JPlot/wiki) has a set of example plots made with JPlot.
 
 ### Contributing 
 
