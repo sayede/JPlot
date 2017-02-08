@@ -6,7 +6,17 @@
     <meta name="description" content="Jplot : "> 
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-    <style>table {border: none;}</style> 
+    <style>
+  #jplot {
+  position: absolute;
+  width: 60px;
+  z-index: 10;
+  bottom: -40px;
+  left: 0;
+  height: 60px;
+  background: url('../images/icon_download.png') no-repeat 0% 90%;
+  }
+    </style> 
     <title>Jplot</title> 
   </head>  
   <body>  
@@ -17,12 +27,13 @@
  
           <h1>WIEN2K plot with</h1>
           <h2 id="project_tagline"></h2>
-
-            <section id="downloads">
-              <img src="http://i.imgur.com/Oqiq0fU.png" alt="JPLOT Icon" width="90" height="90">
+          <section id="jplot">
+            <img src="http://i.imgur.com/Oqiq0fU.png" alt="JPLOT Icon" width="90" height="90">
+          </section> 
+          <section id="downloads">
               <a class="zip_download_link" href="https://github.com/sayede/JPlot/archive/master.zip">Download this project as a .zip file</a>
               <a class="tar_download_link" href="https://github.com/sayede/JPlot/archive/master.tar.gz">Download this project as a tar.gz file</a>
-            </section>
+           </section>
         </header>
     </div> 
 
