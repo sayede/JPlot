@@ -65,13 +65,15 @@ border: none;
                      <table>
                         <tbody>
                            <tr>
+<td>
+	    <a href="#" data-toggle="tooltip" title="About JPlot">
+        <img style="opacity: 1;" src="images/JPlot.png" class="sba img-responsive" alt="Cinque Terre" width="50"></a>
+</td>
                               <td>
                                  <h4>Electron density plots </h4>
                               </td>
                               <td>&nbsp;</td>
                               <td>
-                                 <a href="#" data-toggle="tooltip" title="About JPlot">
-                                 <img src="images/about.png" class="sba img-responsive" alt="Cinque Terre" width="20" height="20"></a>
                               </td>
                            </tr>
                         </tbody>
