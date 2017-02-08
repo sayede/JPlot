@@ -27,5 +27,10 @@ JPlot use :
 * Bootbox 
 * jQuery UI
 * Highcharts
+* Plotly
+* Rgbcolor
+* StackBlur
+* Canvg
+* Bootstrap-colorpicker
 
 Those libraries are already contained in the zip or tar.gz archive. It is not necessary to install them.
