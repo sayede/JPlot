@@ -317,12 +317,14 @@ Full-Width Styles
 
   #jplot {
   position: absolute;
-  width: 120px;
   z-index: 10;
   top : 20px;
   left: 5;
   height: 60px;
   }
+.noborder {
+    border:none;
+}
 
 .jplot_icon {
  border: 0px solid #ebebeb;
