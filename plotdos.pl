@@ -397,7 +397,6 @@ function updateColor(series){
 }
 
 function plot(){
-
 \$('#resz').css('border', 'solid 1px #5CB85C'); 
 lntpp="solid";
 lw=0.5;
@@ -530,11 +529,10 @@ Highcharts.wrap(Highcharts.Axis.prototype, 'getLinePath', function (proceed, lin
                                              label: "Change",
                                              className: "btn-success",
                                              callback: function () {
-                                              myserie.update({color: \$('#mycolor').val(),lineWidth:\$('#mylw').val(),dashStyle:\$('#myln').val()});
-                                                \$('#lw'+Name+'').val(\$('#mylw').val())
-                                                \$('#style'+Name+'').val(\$('#myln').val())
-                                                \$('#color'+Name+'').val(\$('#mycolor').val())
-
+                                                \$('#'+Name+'lw').val(\$('#mylw').val())
+                                                \$('#'+Name+'lt').val(\$('#myln').val())
+                                                \$('#'+Name+'clr').val(\$('#mycolor').val())
+						 plot()
                                              }
                                          }
                                      }
@@ -901,7 +899,7 @@ EOF
 }
 
 print <<EOF;
-
+type=\$('#plttyp').val()
 x=document.getElementById('dos2'+nlay+'');
 data = new Array()
 for(i=0; i < x.options.length; i++){
@@ -909,24 +907,24 @@ for(i=0; i < x.options.length; i++){
       if (doslabel.substring(0, 4) == 'Plot') continue;
       if (doslabel.length == 0) continue;
 
-      eval('color=\$("#clr'+doslabel+'").text()')
-      eval('style=\$("#style'+doslabel+'").text()')
+      eval('color=\$("#'+doslabel+'clr").val()')
+      eval('style=\$("#'+doslabel+'lt").val()')
+      eval('lw=\$("#'+doslabel+'lw").val()')
 
       if (\$('#selspin').length) {	
-        
 	spin = \$('#selspin').val(); 
 	    if (spin=="Up"){
-            eval('data.push({name: "'+doslabel+'", data: h[doslabel+"_up"],color:"'+color+'",dashStyle:"'+style+'"})');
+            eval('data.push({name: "'+doslabel+'", data: h[doslabel+"_up"],color:"'+color+'",dashStyle:"'+style+'", lineWidth:'+lw+', type:"'+type+'"})');
 	    }
 	    if (spin=="Dn"){
-	    eval('data.push({name: "'+doslabel+'", data: h[doslabel+"_dn"],color:"'+color+'",dashStyle:"'+style+'"})');
+	    eval('data.push({name: "'+doslabel+'", data: h[doslabel+"_dn"],color:"'+color+'",dashStyle:"'+style+'", lineWidth:'+lw+', type:"'+type+'"})');
 	    }
 	    if (spin=="UpDn"){
-            eval('data.push({name: "'+doslabel+'", data: h[doslabel+"_up"],color:"'+color+'",dashStyle:"'+style+'"})');
-            eval('data.push({data: h[doslabel+"_dn"],color:"'+color+'",dashStyle:"'+style+'",  showInLegend: false, linkedTo: ":previous"})');
+            eval('data.push({name: "'+doslabel+'", data: h[doslabel+"_up"],color:"'+color+'",dashStyle:"'+style+'", lineWidth:'+lw+', type:"'+type+'"})');
+            eval('data.push({name: "'+doslabel+'", data: h[doslabel+"_dn"],color:"'+color+'",dashStyle:"'+style+'", lineWidth:'+lw+', type:"'+type+'",  showInLegend: false, linkedTo: ":previous"})');
 	    }
       }else{
-    	    eval('data.push({name: "'+doslabel+'", data: h[doslabel],color:"'+color+'",dashStyle:"'+style+'"})');
+    	    eval('data.push({name: "'+doslabel+'", data: h[doslabel],color:"'+color+'",dashStyle:"'+style+'", lineWidth:'+lw+', type:"'+type+'"})');
 
       }
 }
@@ -1060,12 +1058,13 @@ className: "btn-success",
 }).trigger('change');
 
 
-    \$.each(['line', 'column', 'spline', 'area', 'areaspline', 'scatter', 'pie'], function (i, type) {
+    \$.each(['line', 'spline', 'area', 'areaspline'], function (i, type) {
         \$('#' + type).click(function () {
 	    imax = \$('#imax').val();
 	    for(o=1; o <= imax; o++){
 	    var chart=\$('#container_'+o+'').highcharts()
 	    for(s=0; s < chart.series.length; s++){
+	    \$('#plttyp').val(type)
             chart.series[s].update({
                 type: type
             })
@@ -1214,6 +1213,17 @@ function isNumeric(num) {
 }
 
 </script>
+EOF
+@colors=('#2f7ed8', '#0d233a', '#8bbc21', '#910000', '#1aadce','#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a');
+$k=0;
+for ( $m = 0 ; $m < $s ; $m++ ) {
+if ($k>9){$k=0};
+print "<input type=\"hidden\" id=\"@head[$m]clr\" value=\"$colors[$k]\">\n";
+print "<input type=\"hidden\" id=\"@head[$m]lt\" value=\"solid\">\n";
+print "<input type=\"hidden\" id=\"@head[$m]lw\" value=\"1\">\n";
+$k++;
+}
+print <<EOF;
+<input type="hidden" id="plttyp" value="line">
 </body></html>\n
 EOF
-
